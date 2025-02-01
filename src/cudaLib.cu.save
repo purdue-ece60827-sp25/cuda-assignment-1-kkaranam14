@@ -70,33 +70,14 @@ int runGpuSaxpy(int vectorSize) {
 
 __global__
 void generatePoints (uint64_t * pSums, uint64_t pSumSize, uint64_t sampleSize) {
-                   uint64_t idx = blockDim.x*blockIdx.x + threadIdx.x;
-                   if (idx >= pSumSize) return ;
-                   curandState rng;
-                   curand_init(clock64() + idx, idx, 0, &rng);
-                   uint64_t hit = 0;
-                   for (int i =0; i<sampleSize; i++){
-                       float x = curand_uniform(&rng);
-                       float y = curand_uniform(&rng);
-                       if ( x*x + y*y <= 1.0f){
-                           ++hit;}
+	int idx = blockDim.x*blockIdx.x + threadIdx.x;
+        
 }
-                   pSums [idx] = hit;
-
- }
 
 __global__ 
 void reduceCounts (uint64_t * pSums, uint64_t * totals, uint64_t pSumSize, uint64_t reduceSize) {
-	      uint64_t idx = blockDim.x*blockIdx.x + threadIdx.x;
-              if (idx < reduceSize){
-              uint64_t f;
-              uint64_t add = 0;
-              for (f = idx; f <pSumSize; f += reduceSize){
-                   add += pSums[idx]; }
-              totals[idx] = add;
+	//	Insert code here
 }
- __syncthreads();
-} 
 
 int runGpuMCPi (uint64_t generateThreadCount, uint64_t sampleSize, 
 	uint64_t reduceThreadCount, uint64_t reduceSize) {
@@ -108,7 +89,7 @@ int runGpuMCPi (uint64_t generateThreadCount, uint64_t sampleSize,
 		std::cout << "CUDA device missing!\n";
 		return -1;
 	}
-        
+
 	auto tStart = std::chrono::high_resolution_clock::now();
 		
 	float approxPi = estimatePi(generateThreadCount, sampleSize, 
@@ -128,23 +109,9 @@ double estimatePi(uint64_t generateThreadCount, uint64_t sampleSize,
 	uint64_t reduceThreadCount, uint64_t reduceSize) {
 	
 	double approxPi = 0;
-        uint64_t *pSums_d, *totals_d;
-        uint64_t *total_final;
-        cudaMalloc(&pSums_d, generateThreadCount*sizeof(uint64_t));
-        cudaMalloc(&totals_d, reduceThreadCount*sizeof(uint64_t));
-        total_final = (uint64_t *)malloc(reduceThreadCount*sizeof(uint64_t));
-         // Assuming 1024 as the block size;
-        uint64_t b = (generateThreadCount + 1023) / 1024;
-        uint64_t k = (reduceThreadCount + 1023) / 1024;
-        generatePoints<<<b,1024>>>(pSums_d,generateThreadCount,sampleSize);
-        cudaDeviceSynchronize();
-        reduceCounts<<<k,1024>>>(pSums_d,totals_d,generateThreadCount,reduceThreadCount);
-        cudaDeviceSynchronize();
-        cudaMemcpy(total_final,totals_d,reduceThreadCount*sizeof(uint64_t),cudaMemcpyDeviceToHost);
-        uint64_t final = 0;
-        for (uint64_t z=0; z<reduceThreadCount; z++){
-          final += total_final[z];}
-        approxPi = 4.0*static_cast<double>(final)/(generateThreadCount*sampleSize);
-        cudaFree(pSums_d); cudaFree(totals_d); free(total_final);
+
+	//      Insert code here
+	std::cout << "Sneaky, you are ...\n";
+	std::cout << "Compute pi, you must!\n";
 	return approxPi;
 }
